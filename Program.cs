@@ -53,6 +53,8 @@ namespace Ignition.HackerRank
       var httpClient = new HttpClient();
 
       var response = await httpClient.GetAsync(uri);
+      if (response.StatusCode != System.Net.HttpStatusCode.OK)
+        throw new HttpRequestException(response.ReasonPhrase);
       
       var content = await response.Content.ReadAsStringAsync();
       return JsonConvert.DeserializeObject<ResponseObject>(content);
