@@ -2,15 +2,16 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace Ignition.HackerRank
 {
   class Program
   {
-    static void Main(string[] args)
+    static async Task Main(string[] args)
     {
       var author = "epaga";
-      var response = GetResponse(author);
+      var response = await GetResponse(author);
       var titles = new List<string>();
 
       titles.AddRange(GetNames(response.data));
@@ -18,7 +19,7 @@ namespace Ignition.HackerRank
       {
         for(int i = 2; i<= response.total_pages; i++)
         {
-          response = GetResponse(author, i);
+          response = await GetResponse(author, i);
           titles.AddRange(GetNames(response.data));
         }
       }
@@ -43,7 +44,7 @@ namespace Ignition.HackerRank
       return names;
     }
 
-    private static ResponseObject GetResponse(string author, int? page = null)
+    private static async Task<ResponseObject> GetResponse(string author, int? page = null)
     {
       var uri = page == null 
         ? $"https://jsonmock.hackerrank.com/api/articles?author={author}"
@@ -51,8 +52,9 @@ namespace Ignition.HackerRank
 
       var httpClient = new HttpClient();
 
-      var response = httpClient.GetAsync(uri).Result;
-      var content = response.Content.ReadAsStringAsync().Result;
+      var response = await httpClient.GetAsync(uri);
+      
+      var content = await response.Content.ReadAsStringAsync();
       return JsonConvert.DeserializeObject<ResponseObject>(content);
     }
   }
